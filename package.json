@@ -1,0 +1,14 @@
+{
+  "name": "wedtest",
+  "version": "1.0.0",
+  "description": "Simple Node login system",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node -e \"console.log('no tests')\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

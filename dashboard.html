@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard</title>
+<script>
+async function getQuote(){
+  const token=localStorage.getItem('token');
+  const res=await fetch('/quote',{headers:{'Authorization':'Bearer '+token}});
+  const data=await res.json();
+  if(res.ok){
+    document.getElementById('quote').textContent=data.content+' — '+data.author;
+  }else{
+    alert(data.error||'Failed to fetch quote');
+  }
+}
+</script>
+</head>
+<body>
+<h1>Dashboard</h1>
+<button onclick="getQuote()">Get Quote</button>
+<p id="quote"></p>
+</body>
+</html>
