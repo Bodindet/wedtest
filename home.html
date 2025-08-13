@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Thai Fabric Pattern Analyzer - หน้าหลัก</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        thai: {
+                            gold: '#FFD700',
+                            red: '#DC143C',
+                            blue: '#1E3A8A',
+                            green: '#059669'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body class="bg-gradient-to-br from-orange-50 to-red-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-thai-gold to-thai-red rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">🧵</span>
+                    </div>
+                    <span class="text-xl font-bold text-gray-800">AI Thai Fabric</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="home.html" class="nav-btn text-thai-red font-medium">หน้าหลัก</a>
+                    <a href="analyzer.html" class="nav-btn text-gray-700 hover:text-thai-red font-medium">วิเคราะห์ลวดลาย</a>
+                    <a href="database.html" class="nav-btn text-gray-700 hover:text-thai-red font-medium">ฐานข้อมูลผ้าไทย</a>
+                    <a href="technology.html" class="nav-btn text-gray-700 hover:text-thai-red font-medium">เทคโนโลยี</a>
+                    <a href="about.html" class="nav-btn text-gray-700 hover:text-thai-red font-medium">เกี่ยวกับเรา</a>
+                </div>
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="home.html" class="block px-3 py-2 text-thai-red">หน้าหลัก</a>
+                <a href="analyzer.html" class="block px-3 py-2 text-gray-700 hover:text-thai-red">วิเคราะห์ลวดลาย</a>
+                <a href="database.html" class="block px-3 py-2 text-gray-700 hover:text-thai-red">ฐานข้อมูลผ้าไทย</a>
+                <a href="technology.html" class="block px-3 py-2 text-gray-700 hover:text-thai-red">เทคโนโลยี</a>
+                <a href="about.html" class="block px-3 py-2 text-gray-700 hover:text-thai-red">เกี่ยวกับเรา</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Section -->
+    <section id="home" class="section-content">
+        <!-- Hero Section -->
+        <div class="relative thai-pattern py-20 overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-r from-thai-blue/90 to-thai-red/90"></div>
+            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="fade-in">
+                    <h1 class="text-4xl md:text-6xl font-bold text-white mb-6">
+                        AI เพื่ออนุรักษ์<br>ลวดลายผ้าไทย
+                    </h1>
+                    <p class="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto">
+                        ระบบวิเคราะห์ลวดลายผ้าไทยด้วยปัญญาประดิษฐ์ เพื่อส่งเสริมการเรียนรู้และอนุรักษ์มรดกทางวัฒนธรรมไทย
+                    </p>
+                    <a href="analyzer.html" class="bg-thai-gold hover:bg-yellow-500 text-thai-blue font-bold py-4 px-8 rounded-full text-lg transition-all duration-300 hover:scale-105 shadow-lg inline-block">
+                        🔍 เริ่มวิเคราะห์ลวดลาย
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">คุณสมบัติเด่น</h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="text-center hover-lift bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-xl">
+                        <div class="w-16 h-16 bg-thai-blue rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-2xl">🤖</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">AI วิเคราะห์อัตโนมัติ</h3>
+                        <p class="text-gray-600">ใช้โมเดล CNN วิเคราะห์และจำแนกลวดลายผ้าไทยได้อย่างแม่นยำ</p>
+                    </div>
+                    <div class="text-center hover-lift bg-gradient-to-br from-red-50 to-red-100 p-8 rounded-xl">
+                        <div class="w-16 h-16 bg-thai-red rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-2xl">📚</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">ฐานข้อมูลครบถ้วน</h3>
+                        <p class="text-gray-600">คลังความรู้ผ้าไทยจากทุกภูมิภาค พร้อมประวัติและเทคนิคการทอ</p>
+                    </div>
+                    <div class="text-center hover-lift bg-gradient-to-br from-green-50 to-green-100 p-8 rounded-xl">
+                        <div class="w-16 h-16 bg-thai-green rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-2xl">🎯</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">ความแม่นยำสูง</h3>
+                        <p class="text-gray-600">ระบบให้ผลลัพธ์ที่แม่นยำพร้อมระดับความเชื่อมั่น</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="flex items-center justify-center space-x-3 mb-4">
+                <div class="w-8 h-8 bg-gradient-to-r from-thai-gold to-thai-red rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold">🧵</span>
+                </div>
+                <span class="text-xl font-bold">AI Thai Fabric</span>
+            </div>
+            <p class="text-gray-400">เทคโนโลยี AI เพื่ออนุรักษ์และส่งเสริมมรดกทางวัฒนธรรมไทย</p>
+        </div>
+    </footer>
+</body>
+</html>
