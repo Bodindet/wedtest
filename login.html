@@ -4,12 +4,30 @@
 <meta charset="UTF-8">
 <title>Login</title>
 <script>
+async function fetchCsrf(){
+  const res=await fetch('/csrf-token');
+  const data=await res.json();
+  document.getElementById('csrfToken').value=data.csrfToken;
+}
+
 async function login(event){
   event.preventDefault();
   const username=document.getElementById('username').value;
   const password=document.getElementById('password').value;
-  const res=await fetch('/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
+  const csrfToken=document.getElementById('csrfToken').value;
+  const body={username,password,csrfToken};
+  const captcha=document.getElementById('captcha-answer').value;
+  if(document.getElementById('captcha').style.display!=='none'){
+    body.captchaAnswer=captcha;
+  }
+  const res=await fetch('/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   const data=await res.json();
+  if(data.captcha){
+    document.getElementById('captcha-question').innerText=data.captcha.question;
+    document.getElementById('captcha').style.display='block';
+    alert(data.error||'CAPTCHA required');
+    return;
+  }
   if(res.ok){
     localStorage.setItem('token',data.token);
     window.location.href='dashboard.html';
@@ -17,13 +35,20 @@ async function login(event){
     alert(data.error||'Login failed');
   }
 }
+
+window.onload=fetchCsrf;
 </script>
 </head>
 <body>
 <h1>Login</h1>
 <form onsubmit="login(event)">
+<input id="csrfToken" type="hidden">
 <input id="username" placeholder="Username" required>
 <input id="password" type="password" placeholder="Password" required>
+<div id="captcha" style="display:none;">
+  <p id="captcha-question"></p>
+  <input id="captcha-answer" placeholder="Answer">
+</div>
 <button type="submit">Login</button>
 </form>
 <p><a href="register.html">Register</a></p>
