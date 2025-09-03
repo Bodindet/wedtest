@@ -1,31 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>Login</title>
+<title>เข้าสู่ระบบ</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="thai-pattern">
+<div class="login-container fade-in">
+  <h1>เข้าสู่ระบบ</h1>
+  <form id="loginForm" onsubmit="login(event)" class="login-form">
+    <input id="email" type="text" placeholder="อีเมลหรือชื่อผู้ใช้" class="input-field" required>
+    <span id="emailError" class="error hidden">รูปแบบอีเมลไม่ถูกต้อง</span>
+    <input id="password" type="password" placeholder="รหัสผ่าน" class="input-field" required>
+    <label class="remember"><input type="checkbox" id="remember"> จำฉันไว้</label>
+    <button type="submit" class="btn-primary">เข้าสู่ระบบ</button>
+  </form>
+  <a href="#" class="forgot-link">ลืมรหัสผ่าน?</a>
+  <div class="sso-buttons">
+    <button class="btn-sso-google">Google</button>
+    <button class="btn-sso-apple">Apple</button>
+    <button class="btn-sso-github">GitHub</button>
+  </div>
+  <p><a href="register.html">ลงทะเบียน</a></p>
+</div>
+<div id="toast" class="toast hidden"></div>
 <script>
 async function login(event){
   event.preventDefault();
-  const username=document.getElementById('username').value;
+  const username=document.getElementById('email').value.trim();
   const password=document.getElementById('password').value;
+  const remember=document.getElementById('remember').checked;
   const res=await fetch('/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
   const data=await res.json();
   if(res.ok){
-    localStorage.setItem('token',data.token);
-    window.location.href='dashboard.html';
+    if(remember){
+      localStorage.setItem('token',data.token);
+    }else{
+      sessionStorage.setItem('token',data.token);
+    }
+    const ref=document.referrer && document.referrer!==window.location.href?document.referrer:'dashboard.html';
+    window.location.href=ref;
   }else{
-    alert(data.error||'Login failed');
+    showToast(data.error||'เข้าสู่ระบบไม่สำเร็จ');
   }
 }
+
+function showToast(msg){
+  const toast=document.getElementById('toast');
+  toast.textContent=msg;
+  toast.classList.remove('hidden');
+  setTimeout(()=>toast.classList.add('hidden'),3000);
+}
+
+const emailInput=document.getElementById('email');
+const emailError=document.getElementById('emailError');
+emailInput.addEventListener('input',()=>{
+  const value=emailInput.value.trim();
+  const isEmail=value.includes('@');
+  const valid=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  if(isEmail && !valid){
+    emailError.classList.remove('hidden');
+  }else{
+    emailError.classList.add('hidden');
+  }
+});
 </script>
-</head>
-<body>
-<h1>Login</h1>
-<form onsubmit="login(event)">
-<input id="username" placeholder="Username" required>
-<input id="password" type="password" placeholder="Password" required>
-<button type="submit">Login</button>
-</form>
-<p><a href="register.html">Register</a></p>
 </body>
 </html>
+
