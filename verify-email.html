@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Verify Email</title>
+<script>
+async function resend(){
+  const email=localStorage.getItem('pendingEmail');
+  if(!email){
+    alert('No email to verify');
+    return;
+  }
+  const res=await fetch('/resend-verification',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:email})});
+  const data=await res.json();
+  alert(data.status || data.error || 'Unable to resend');
+}
+</script>
+</head>
+<body>
+<h1>ตรวจสอบอีเมลเพื่อยืนยันบัญชี</h1>
+<p>เราได้ส่งลิงก์ยืนยันไปที่อีเมลของคุณ</p>
+<button onclick="resend()">Resend verification</button>
+<p><a href="login.html">Login</a></p>
+</body>
+</html>

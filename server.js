@@ -65,9 +65,27 @@ function serveFile(res, filePath) {
   });
 }
 
+async function verifyTurnstile(token) {
+  const secret = process.env.TURNSTILE_SECRET;
+  if (!secret) return true;
+  try {
+    const form = new URLSearchParams();
+    form.append('secret', secret);
+    form.append('response', token);
+    const resp = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      body: form
+    });
+    const data = await resp.json();
+    return data.success;
+  } catch (err) {
+    return false;
+  }
+}
+
 const server = http.createServer(async (req, res) => {
   const parsed = url.parse(req.url, true);
-  const staticFiles = ['/', '/home.html', '/about.html', '/analyzer.html', '/database.html', '/technology.html', '/script.js', '/style.css', '/login.html', '/register.html', '/dashboard.html'];
+  const staticFiles = ['/', '/home.html', '/about.html', '/analyzer.html', '/database.html', '/technology.html', '/script.js', '/style.css', '/login.html', '/register.html', '/verify-email.html', '/dashboard.html'];
   if (req.method === 'GET' && staticFiles.includes(parsed.pathname)) {
     const file = parsed.pathname === '/' ? '/home.html' : parsed.pathname;
     return serveFile(res, path.join(__dirname, file));
@@ -75,15 +93,33 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === 'POST' && parsed.pathname === '/register') {
     try {
-      const { username, password } = await parseBody(req);
-      if (!username || !password) return send(res, 400, { error: 'username and password required' });
+      const { username, password, displayName, token } = await parseBody(req);
+      if (!username || !password || !displayName || !token) {
+        return send(res, 400, { error: 'missing fields' });
+      }
+      if (!await verifyTurnstile(token)) {
+        return send(res, 400, { error: 'invalid captcha' });
+      }
       const users = readUsers();
       if (users.find(u => u.username === username)) return send(res, 400, { error: 'user exists' });
       const passwordHash = hashPassword(password);
       const id = users.length ? users[users.length - 1].id + 1 : 1;
-      users.push({ id, username, passwordHash });
+      users.push({ id, username, displayName, passwordHash, verified: false });
       writeUsers(users);
       return send(res, 201, { status: 'registered' });
+    } catch (err) {
+      return send(res, 500, { error: 'server error' });
+    }
+  }
+
+  if (req.method === 'POST' && parsed.pathname === '/resend-verification') {
+    try {
+      const { username } = await parseBody(req);
+      if (!username) return send(res, 400, { error: 'username required' });
+      const users = readUsers();
+      const user = users.find(u => u.username === username);
+      if (!user) return send(res, 404, { error: 'user not found' });
+      return send(res, 200, { status: 'sent' });
     } catch (err) {
       return send(res, 500, { error: 'server error' });
     }
