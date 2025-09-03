@@ -12,9 +12,25 @@ async function login(event){
   const data=await res.json();
   if(res.ok){
     localStorage.setItem('token',data.token);
-    window.location.href='dashboard.html';
+    if(data.twoFA){
+      document.getElementById('twofa').style.display='block';
+    }else{
+      window.location.href='dashboard.html';
+    }
   }else{
     alert(data.error||'Login failed');
+  }
+}
+
+async function verify2fa(){
+  const token=localStorage.getItem('token');
+  const code=document.getElementById('code').value;
+  const res=await fetch('/api/user/2fa/verify',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({code})});
+  const data=await res.json();
+  if(res.ok){
+    window.location.href='dashboard.html';
+  }else{
+    alert(data.error||'2FA failed');
   }
 }
 </script>
@@ -27,5 +43,10 @@ async function login(event){
 <button type="submit">Login</button>
 </form>
 <p><a href="register.html">Register</a></p>
+<div id="twofa" style="display:none;">
+  <h3>Enter 2FA Code</h3>
+  <input id="code" placeholder="Code">
+  <button onclick="verify2fa()">Verify</button>
+</div>
 </body>
 </html>
