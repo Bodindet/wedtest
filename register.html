@@ -11,7 +11,7 @@ async function registerUser(event){
   const res=await fetch('/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
   const data=await res.json();
   if(res.ok){
-    alert('Registered! Please login.');
+    alert('Registered! Please verify your email.');
     window.location.href='login.html';
   }else{
     alert(data.error||'Registration failed');
