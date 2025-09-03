@@ -29,6 +29,64 @@ function verifyPassword(password, stored) {
 }
 
 const sessions = {};
+const csrfTokens = new Set();
+const rateLimits = {};
+const failedLogins = {};
+const captchaChallenges = {};
+
+function parseCookies(req){
+  const list={};
+  const cookie=req.headers.cookie;
+  if(!cookie) return list;
+  cookie.split(';').forEach(c=>{
+    const parts=c.split('=');
+    list[parts.shift().trim()]=decodeURIComponent(parts.join('='));
+  });
+  return list;
+}
+
+function generateCsrfToken(){
+  const token=crypto.randomBytes(24).toString('hex');
+  csrfTokens.add(token);
+  return token;
+}
+
+function validateCsrf(req,token){
+  const cookies=parseCookies(req);
+  if(token && cookies.csrfToken===token && csrfTokens.has(token)){
+    csrfTokens.delete(token);
+    return true;
+  }
+  return false;
+}
+
+function checkRateLimit(ip,path,limit=5,windowMs=60000){
+  const key=`${path}:${ip}`;
+  const now=Date.now();
+  if(!rateLimits[key]||now-rateLimits[key].time>windowMs){
+    rateLimits[key]={count:1,time:now};
+    return false;
+  }
+  rateLimits[key].count++;
+  return rateLimits[key].count>limit;
+}
+
+function createCaptcha(ip){
+  const a=Math.floor(Math.random()*10);
+  const b=Math.floor(Math.random()*10);
+  captchaChallenges[ip]={a,b};
+  return {question:`What is ${a} + ${b}?`};
+}
+
+function verifyCaptcha(ip,answer){
+  const ch=captchaChallenges[ip];
+  if(!ch) return true;
+  if(parseInt(answer,10)===ch.a+ch.b){
+    delete captchaChallenges[ip];
+    return true;
+  }
+  return false;
+}
 
 function send(res, status, data, contentType = 'application/json') {
   res.writeHead(status, { 'Content-Type': contentType });
@@ -73,9 +131,28 @@ const server = http.createServer(async (req, res) => {
     return serveFile(res, path.join(__dirname, file));
   }
 
+  if (req.method === 'GET' && parsed.pathname === '/csrf-token') {
+    const token = generateCsrfToken();
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Set-Cookie': `csrfToken=${token}; HttpOnly`
+    });
+    return res.end(JSON.stringify({ csrfToken: token }));
+  }
+
   if (req.method === 'POST' && parsed.pathname === '/register') {
     try {
-      const { username, password } = await parseBody(req);
+      const ip = req.socket.remoteAddress;
+      if (checkRateLimit(ip, '/register')) {
+        const captcha = createCaptcha(ip);
+        return send(res, 429, { error: 'Too many requests', captcha });
+      }
+      const { username, password, csrfToken, captchaAnswer } = await parseBody(req);
+      if (!validateCsrf(req, csrfToken)) return send(res, 403, { error: 'invalid csrf token' });
+      if (!verifyCaptcha(ip, captchaAnswer)) {
+        const captcha = createCaptcha(ip);
+        return send(res, 403, { error: 'captcha required', captcha });
+      }
       if (!username || !password) return send(res, 400, { error: 'username and password required' });
       const users = readUsers();
       if (users.find(u => u.username === username)) return send(res, 400, { error: 'user exists' });
@@ -91,15 +168,50 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === 'POST' && parsed.pathname === '/login') {
     try {
-      const { username, password } = await parseBody(req);
+      const ip = req.socket.remoteAddress;
+      if (checkRateLimit(ip, '/login')) {
+        const captcha = createCaptcha(ip);
+        return send(res, 429, { error: 'Too many requests', captcha });
+      }
+      const { username, password, csrfToken, captchaAnswer } = await parseBody(req);
+      if (!validateCsrf(req, csrfToken)) return send(res, 403, { error: 'invalid csrf token' });
+      if (!verifyCaptcha(ip, captchaAnswer)) {
+        const captcha = createCaptcha(ip);
+        return send(res, 403, { error: 'captcha required', captcha });
+      }
       const users = readUsers();
       const user = users.find(u => u.username === username);
       if (!user || !verifyPassword(password, user.passwordHash)) {
+        failedLogins[ip] = (failedLogins[ip] || 0) + 1;
+        if (failedLogins[ip] >= 3) {
+          const captcha = createCaptcha(ip);
+          return send(res, 401, { error: 'invalid credentials', captcha });
+        }
         return send(res, 401, { error: 'invalid credentials' });
       }
+      failedLogins[ip] = 0;
       const token = crypto.randomBytes(16).toString('hex');
       sessions[token] = user.username;
       return send(res, 200, { token });
+    } catch (err) {
+      return send(res, 500, { error: 'server error' });
+    }
+  }
+
+  if (req.method === 'POST' && parsed.pathname === '/forgot-password') {
+    try {
+      const ip = req.socket.remoteAddress;
+      if (checkRateLimit(ip, '/forgot-password')) {
+        const captcha = createCaptcha(ip);
+        return send(res, 429, { error: 'Too many requests', captcha });
+      }
+      const { csrfToken, captchaAnswer } = await parseBody(req);
+      if (!validateCsrf(req, csrfToken)) return send(res, 403, { error: 'invalid csrf token' });
+      if (!verifyCaptcha(ip, captchaAnswer)) {
+        const captcha = createCaptcha(ip);
+        return send(res, 403, { error: 'captcha required', captcha });
+      }
+      return send(res, 200, { status: 'reset link sent' });
     } catch (err) {
       return send(res, 500, { error: 'server error' });
     }

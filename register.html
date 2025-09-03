@@ -4,12 +4,30 @@
 <meta charset="UTF-8">
 <title>Register</title>
 <script>
+async function fetchCsrf(){
+  const res=await fetch('/csrf-token');
+  const data=await res.json();
+  document.getElementById('csrfToken').value=data.csrfToken;
+}
+
 async function registerUser(event){
   event.preventDefault();
   const username=document.getElementById('username').value;
   const password=document.getElementById('password').value;
-  const res=await fetch('/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
+  const csrfToken=document.getElementById('csrfToken').value;
+  const body={username,password,csrfToken};
+  const captcha=document.getElementById('captcha-answer').value;
+  if(document.getElementById('captcha').style.display!=='none'){
+    body.captchaAnswer=captcha;
+  }
+  const res=await fetch('/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   const data=await res.json();
+  if(data.captcha){
+    document.getElementById('captcha-question').innerText=data.captcha.question;
+    document.getElementById('captcha').style.display='block';
+    alert(data.error||'CAPTCHA required');
+    return;
+  }
   if(res.ok){
     alert('Registered! Please login.');
     window.location.href='login.html';
@@ -17,13 +35,20 @@ async function registerUser(event){
     alert(data.error||'Registration failed');
   }
 }
+
+window.onload=fetchCsrf;
 </script>
 </head>
 <body>
 <h1>Register</h1>
 <form onsubmit="registerUser(event)">
+<input id="csrfToken" type="hidden">
 <input id="username" placeholder="Username" required>
 <input id="password" type="password" placeholder="Password" required>
+<div id="captcha" style="display:none;">
+  <p id="captcha-question"></p>
+  <input id="captcha-answer" placeholder="Answer">
+</div>
 <button type="submit">Register</button>
 </form>
 <p><a href="login.html">Login</a></p>
