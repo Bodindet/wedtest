@@ -22,7 +22,8 @@
         }
     </script>
     <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+    <script type="module" src="nav.js"></script>
+    <script type="module" src="analyzer.js"></script>
 </head>
 <body class="bg-gradient-to-br from-orange-50 to-red-50 min-h-screen">
     <!-- Navigation -->
@@ -43,7 +44,7 @@
                     <a href="about.html" class="nav-btn text-gray-700 hover:text-thai-red font-medium">เกี่ยวกับเรา</a>
                 </div>
                 <div class="md:hidden">
-                    <button onclick="toggleMobileMenu()" class="text-gray-700">
+                    <button onclick="nav.toggleMobileMenu()" class="text-gray-700">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>
@@ -95,7 +96,7 @@
                         <h3 class="text-xl font-bold text-gray-800 mb-2">ผ้ามัดหมี่</h3>
                         <p class="text-thai-red font-medium mb-2">ภาคตะวันออกเฉียงเหนือ</p>
                         <p class="text-gray-600 text-sm mb-4">ผ้าทอพื้นเมืองที่มีเทคนิคการมัดด้ายก่อนย้อมสี ทำให้เกิดลวดลายที่มีเอกลักษณ์</p>
-                        <button onclick="showFabricDetail('mudmee')" class="text-thai-blue hover:text-blue-700 font-medium">อ่านเพิ่มเติม →</button>
+                        <button onclick="analyzer.showFabricDetail('mudmee')" class="text-thai-blue hover:text-blue-700 font-medium">อ่านเพิ่มเติม →</button>
                     </div>
                 </div>
                 <!-- Jok Card -->
@@ -107,7 +108,7 @@
                         <h3 class="text-xl font-bold text-gray-800 mb-2">ผ้าจก</h3>
                         <p class="text-thai-red font-medium mb-2">ภาคกลาง</p>
                         <p class="text-gray-600 text-sm mb-4">ผ้าที่มีลวดลายเกิดจากการทอด้วยเทคนิคพิเศษ มักใช้ในงานพิธีการสำคัญ</p>
-                        <button onclick="showFabricDetail('jok')" class="text-thai-blue hover:text-blue-700 font-medium">อ่านเพิ่มเติม →</button>
+                        <button onclick="analyzer.showFabricDetail('jok')" class="text-thai-blue hover:text-blue-700 font-medium">อ่านเพิ่มเติม →</button>
                     </div>
                 </div>
                 <!-- Yok Dok Card -->
@@ -119,7 +120,7 @@
                         <h3 class="text-xl font-bold text-gray-800 mb-2">ผ้ายกดอก</h3>
                         <p class="text-thai-red font-medium mb-2">ภาคเหนือ</p>
                         <p class="text-gray-600 text-sm mb-4">ผ้าที่มีลวดลายดอกไม้นูนขึ้นมาจากพื้นผ้า สวยงามและประณีต</p>
-                        <button onclick="showFabricDetail('yokdok')" class="text-thai-blue hover:text-blue-700 font-medium">อ่านเพิ่มเติม →</button>
+                        <button onclick="analyzer.showFabricDetail('yokdok')" class="text-thai-blue hover:text-blue-700 font-medium">อ่านเพิ่มเติม →</button>
                     </div>
                 </div>
                 <!-- Kab Bua Card -->
@@ -131,7 +132,7 @@
                         <h3 class="text-xl font-bold text-gray-800 mb-2">ผ้ากาบบัว</h3>
                         <p class="text-thai-red font-medium mb-2">ภาคใต้</p>
                         <p class="text-gray-600 text-sm mb-4">ผ้าที่มีลวดลายคล้ายกาบบัว เป็นเอกลักษณ์ของภาคใต้</p>
-                        <button onclick="showFabricDetail('kabbua')" class="text-thai-blue hover:text-blue-700 font-medium">อ่านเพิ่มเติม →</button>
+                        <button onclick="analyzer.showFabricDetail('kabbua')" class="text-thai-blue hover:text-blue-700 font-medium">อ่านเพิ่มเติม →</button>
                     </div>
                 </div>
             </div>

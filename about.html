@@ -22,7 +22,7 @@
         }
     </script>
     <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+    <script type="module" src="nav.js"></script>
 </head>
 <body class="bg-gradient-to-br from-orange-50 to-red-50 min-h-screen">
     <!-- Navigation -->
@@ -43,7 +43,7 @@
                     <a href="about.html" class="nav-btn text-thai-red font-medium">เกี่ยวกับเรา</a>
                 </div>
                 <div class="md:hidden">
-                    <button onclick="toggleMobileMenu()" class="text-gray-700">
+                    <button onclick="nav.toggleMobileMenu()" class="text-gray-700">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>
